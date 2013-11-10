@@ -1,8 +1,6 @@
-#!/usr/bin/env python
-
 """
-convert-bibtex
-Convert titles in a LaTeX Bib file to title case.
+convert
+Conversions and cite key generation for BibTeX files.
 """
 
 import os.path
@@ -12,7 +10,68 @@ import sys
 from conbib.titlecase import titlecase
 
 
+__version__ = '0.2.a1'
+
+
 def main():
+    """Get user-input and perform requested operation."""
+    options = CommandLineInput()
+    if options.mode == 'titlecase':
+        convert_title_to_titlecase(options.input_file, options.output_file)
+    if options.mode == 'citekey':
+        error('  Cite key generation coming soon')
+
+
+class CommandLineInput():
+    """Digest the user-input and define runtime options."""
+    def __init__(self):
+        self._verify_input()
+        self.mode = self._get_mode()
+        self.input_file = self._get_input_file()
+        self.output_file = self._get_output_file()
+
+    def _verify_input(self):
+        """Validate the user input."""
+        if len(sys.argv) < 3:
+            help_message = ('  convert-bibtex\n'
+                            '  Conversions and cite key generation for BibTeX files.\n\n'
+                            '  Usage: convert-bibtex <mode> <input-file>\n\n'
+                            '    <mode>     Description\n'
+                            '    titlecase  Convert all titles to titlecase\n'
+                            '    citekey    Generate cite keys for all entries\n'
+                            '               according to the following scheme:\n'
+                            '               <Last Author`s Last Name><2-Digit Year>_<Page Number OR Entry Type>\n\n'
+                            '    <input-file> is a BibTeX .bib file that will not be overwritten')
+            error(help_message)
+
+    def _get_mode(self):
+        """Get the mode in which the program should be run."""
+        allowed_modes = ['titlecase', 'citekey']
+        mode = sys.argv[1]
+        if mode in allowed_modes:
+            return mode
+        else:
+            invalid_mode_message = ('  [ERROR] Invalid Mode\n'
+                                    '          Allowed modes:'
+                                    ' %s' % ', '.join(map(str, allowed_modes)))
+            error(invalid_mode_message)
+    
+    def _get_input_file(self):
+        """Get the LaTeX input file from command line."""
+        file_to_convert = sys.argv[2]
+        if os.path.exists(file_to_convert):
+            return file_to_convert
+        else:
+            error("File `%s' does not exist" % file_to_convert)
+    
+    def _get_output_file(self):
+        """Generate the output filename as `input_filename.titlecase.bib'."""
+        components = self.input_file.rsplit('.', 1)
+        output_file_name = '.'.join([components[0], self.mode, components[1]])
+        return output_file_name
+
+
+def convert_title_to_titlecase(input_file, output_file):
     """Convert all titles in the `title' attribute of a Bib file to titlecase.
     
     This routine takes in a LaTeX .bib file and parses line-by-line searching
@@ -22,41 +81,22 @@ def main():
     `input_filename.titlecase.bib'.
     
     """
-    input_file = get_input_file()
-    print 'Input file: %s' % input_file
-    output_file = get_output_file(input_file)
-    print 'Output file: %s' % output_file
+    print ('  Input file: %s\n  Output file: %s\n'
+           '  Converting all title attributes to titlecase'
+           % (input_file, output_file))
     out = open(output_file, 'w')
-    print 'Converting all title attributes to titlecase'
-    count = 0
+    items_updated = 0
     with open(input_file) as f:
         for line in f:
             if is_title(line):
                 title = get_title(line)
                 titlecase_title = make_titlecase_title(line) 
                 out.write(titlecase_title)
-                count += 1
+                items_updated += 1
             else:
                 out.write(line)
     out.close()
-    print 'Updated %d Bib items' % count
-
-def get_input_file():
-    """Get the LaTeX input file from command line."""
-    if len(sys.argv) > 1:
-        file_to_convert = sys.argv[1]
-        if os.path.exists(file_to_convert):
-            return file_to_convert
-        else:
-            error("File `%s' does not exist" % file_to_convert)
-    else:
-        error('Please specify an input file')
-
-def get_output_file(input_file):
-    """Generate the output filename as `input_filename.titlecase.bib'."""
-    components = input_file.rsplit('.', 1)
-    output_file_name = '.'.join([components[0], 'titlecase', components[1]])
-    return output_file_name
+    print '  Updated %d Bib items' % items_updated 
 
 def is_title(line):
     """Return True if line contains the title entry."""
@@ -123,6 +163,3 @@ def error(message):
     """Print error message and terminate the program."""
     print str(message)
     sys.exit(0)
-
-if __name__ == '__main__':
-    main()

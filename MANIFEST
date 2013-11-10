@@ -8,3 +8,4 @@ conbib/convert.py
 conbib/titlecase.py
 conbib/tests/__init__.py
 conbib/tests/test.bib
+conbib/tests/test_conbib.py
