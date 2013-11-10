@@ -10,7 +10,7 @@ import sys
 from conbib.titlecase import titlecase
 
 
-__version__ = '0.2.a1'
+__version__ = '0.2.a2'
 
 
 def main():
@@ -98,18 +98,42 @@ def convert_title_to_titlecase(input_file, output_file):
     out.close()
     print '  Updated %d Bib items' % items_updated 
 
+def is_authors(line):
+    """Return True if line contains the authors entry."""
+    return is_item('authors', line)
+
 def is_title(line):
     """Return True if line contains the title entry."""
     return is_item('title', line) 
+
+def is_year(line):
+    """Return True if line contains the year entry."""
+    return is_item('year', line) 
+
+def is_pages(line):
+    """Return True if line contains the pages entry."""
+    return is_item('pages', line) 
 
 def is_item(item, line):
     """Return True if current line contains item."""
     item_key = get_item_key(item) 
     return item_key.match(line)
 
+def get_authors(line):
+    """Return the contents of the `authors' attribute."""
+    return get_attribute_item('authors', 'contents', line)
+
 def get_title(line):
     """Return the contents of the `title' attribute."""
     return get_attribute_item('title', 'contents', line)
+
+def get_year(line):
+    """Return the contents of the `year' attribute."""
+    return get_attribute_item('year', 'contents', line)
+
+def get_pages(line):
+    """Return the contents of the `pages' attribute."""
+    return get_attribute_item('pages', 'contents', line)
 
 def get_attribute_item(item, part, line):
     """Return the part of the attribute item for the given line. 
