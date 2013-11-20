@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 from distutils.core import setup
-from conbib.convert import __version__
-
-version = __version__ 
+from conbib.convert import version
 
 setup(name='convert-bibtex',
       version=version,

@@ -10,7 +10,7 @@ import sys
 from conbib.titlecase import titlecase
 
 
-__version__ = '0.2.a2'
+version = '0.2.a3'
 
 
 def main():
