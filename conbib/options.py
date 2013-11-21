@@ -10,7 +10,7 @@ import re
 import sys
 
 
-version = '0.2'
+version = '0.3'
 
 
 class CommandLineInput():

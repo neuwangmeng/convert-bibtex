@@ -54,7 +54,7 @@ ENTRY_TYPES = ['article',
 
 class BibItem():
     """Main bibiligraphy item class."""
-    def __init__(self, inputfile):
+    def __init__(self, inputfile, missing=None):
         """Construct object by parsing single bibitem in inputfile.
         
         The input file should be a standard Python file object.  As the object
@@ -73,6 +73,7 @@ class BibItem():
         self.volume = None
         self.year = None
         self.pages = None
+        self.missing = missing
 
         for line in inputfile:
             if is_bibitem(line):
@@ -142,23 +143,28 @@ class BibItem():
         For last names such as 'van Kuiken', only 'Kuiken' will be returned.
 
         """
-        split_with_and = self.author.split(' and ')
-        
-        # We now have the last author
-        last_author = split_with_and.pop()
+        if self.author:
+            split_with_and = self.author.split(' and ')
+            
+            # We now have the last author
+            last_author = split_with_and.pop()
 
-        # Extract the last name based on presence/absence of a comma
-        comma = re.compile(r'^(.+),.+')
-        match_comma = comma.match(last_author)
-        if match_comma:
-            last_name = match_comma.group(1).strip()
-            # One last step to remove last name prefix (i.e., 'van Kuiken')
-            split_with_space = last_name.split()
-            last_name = split_with_space.pop()
+            # Extract the last name based on presence/absence of a comma
+            comma = re.compile(r'^(.+),.+')
+            match_comma = comma.match(last_author)
+            if match_comma:
+                last_name = match_comma.group(1).strip()
+                # One last step to remove last name prefix (i.e., 'van Kuiken')
+                split_with_space = last_name.split()
+                last_name = split_with_space.pop()
+            else:
+                split_with_space = last_author.split()
+                last_name = split_with_space.pop()
+            return last_name
         else:
-            split_with_space = last_author.split()
-            last_name = split_with_space.pop()
-        return last_name
+            if self.missing:
+                self.missing.add('Last Name')
+            return 'MISSING'
 
     def get_2d_year(self):
         """Return string containing the 2-digit year.
@@ -166,14 +172,55 @@ class BibItem():
         Example: if the year is '2013', this method returns '13'.
 
         """
-        return self.year[2:]
+        if self.year:
+            return self.year[2:]
+        else:
+            if self.missing:
+                self.missing.add('Year')
+            return 'MISSING'
 
     def get_first_page(self):
         """Return string containing the first page in the pages range."""
         if self.pages:
             return self.pages.split('-')[0]
         else:
+            if self.missing:
+                self.missing.add('Page Number')
             return 'MISSING'
+
+
+class _MissingAttribute():
+    """Missing information tracker for bibitems.
+    
+    This class stores information regarding missing attributes for all bibitems
+    in a given bibfile.
+    
+    """
+    def __init__(self):
+        self.is_missing = False
+        self.missing_items = {}
+
+    def add(self, attribute):
+        self.is_missing = True
+        if attribute in self.missing_items: 
+            self.missing_items[attribute] += 1
+        else:
+            self.missing_items[attribute] = 1
+
+    def report_missing_items(self):
+        if self.is_missing:
+            warning = ('  \n'
+                       '  *** WARNING ***\n'
+                       '  Some citekeys are incomplete due to missing information\n'
+                       '  Check your .bib file for the following missing items:\n'
+                       '     ------------------------------\n'
+                       '     %-20s  %8s\n'
+                       '     ------------------------------'
+                       % ('Missing Item', 'Count'))
+            print warning
+            for attr,num in self.missing_items.iteritems():
+                print '     %-20s  %8d' % (attr, num)
+            print '     ------------------------------'
 
 
 # The functions below are used to parse the bib file.  They are included as
@@ -322,15 +369,22 @@ def get_file_length(filename):
     return lines
 
 
-def get_bibitems(input_filename):
-    """Return a list of all bibitems as BibItem objects."""
+def get_bibitems(input_filename, record_missing=True):
+    """Return a list of all bibitems as BibItem objects.
+    
+    The last item in the list is an instance of the MissingAttributes class.
+
+    """
     bibitems = []
+    missing = _MissingAttribute()
     file_length = get_file_length(input_filename)
     with open(input_filename, 'rU') as bibfile:
         for i in range(file_length):
-            item = BibItem(bibfile)
+            item = BibItem(bibfile, missing)
             if item.found:
                 bibitems.append(item)
+    if record_missing:
+        bibitems.append(missing)
     return bibitems
 
 

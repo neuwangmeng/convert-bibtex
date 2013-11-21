@@ -34,6 +34,7 @@ def _update_citekeys(input_file, output_file):
            '  Updating bib item cite keys...'
            % (input_file, output_file))
     bibitems = get_bibitems(input_file)
+    missing_items = bibitems.pop()
     out = open(output_file, 'w')
     items_updated = 0
     with open(input_file, 'rU') as f:
@@ -48,6 +49,7 @@ def _update_citekeys(input_file, output_file):
                 out.write(line)
     out.close()
     print '  Updated %d Bib items' % items_updated 
+    missing_items.report_missing_items()
 
 
 def _make_citekey(bibitem):
@@ -122,5 +124,5 @@ def main():
     if options.mode == 'citekey':
         _update_citekeys(options.input_file, options.output_file)
     if options.mode == 'debug':
-        bibitems = get_bibitems(options.input_file)
+        bibitems = get_bibitems(options.input_file, False)
         list_bibitems(bibitems)
