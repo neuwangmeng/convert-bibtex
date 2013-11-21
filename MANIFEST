@@ -4,8 +4,12 @@ README.md
 setup.py
 bin/convert-bibtex
 conbib/__init__.py
+conbib/bibitem.py
 conbib/convert.py
+conbib/options.py
 conbib/titlecase.py
 conbib/tests/__init__.py
+conbib/tests/large.test.bib
+conbib/tests/small.test.bib
 conbib/tests/test.bib
 conbib/tests/test_conbib.py
