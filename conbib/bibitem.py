@@ -235,7 +235,7 @@ class BibItem():
             else:
                 break
 
-    def get_last_author_last_name(self, escape=True):
+    def get_last_author_last_name(self, escape=True, hyphenate=False):
         """Return the last author's last name.
 
         The LaTeX bib file allows for two types of author entries:
@@ -269,6 +269,9 @@ class BibItem():
             \v{Z}uti\'{c}  -->  Zutic
             {\vZ}uti{\'c}  -->  Zutic
 
+        With ``hyphenate`` set to False, hyphens in the name will be preserved.
+        Otherwise, hyphens will be removed from the name.
+
         """
         if self.author:
             split_with_and = self.author.split(' and ')
@@ -292,8 +295,12 @@ class BibItem():
             else:
                 split_with_space = last_author.split()
                 last_name = split_with_space.pop()
+            
+            # Sanitize the last name for citekey generation
             if escape:
                 last_name = escape_encoding(last_name)
+            if not hyphenate:
+                last_name = last_name.translate(None, '-')
             return last_name
         else:
             if self.missing:
