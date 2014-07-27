@@ -235,7 +235,7 @@ class BibItem():
             else:
                 break
 
-    def get_last_author_last_name(self):
+    def get_last_author_last_name(self, escape=True):
         """Return the last author's last name.
 
         The LaTeX bib file allows for two types of author entries:
@@ -261,6 +261,14 @@ class BibItem():
 
         For last names such as 'van Kuiken', only 'Kuiken' will be returned.
 
+        With ``escape`` set to True, LaTeX special character encodings will be
+        removed.  For example, the following will be output regardless of the
+        encoding style:
+            
+            \vZuti\'c      -->  Zutic
+            \v{Z}uti\'{c}  -->  Zutic
+            {\vZ}uti{\'c}  -->  Zutic
+
         """
         if self.author:
             split_with_and = self.author.split(' and ')
@@ -284,6 +292,8 @@ class BibItem():
             else:
                 split_with_space = last_author.split()
                 last_name = split_with_space.pop()
+            if escape:
+                last_name = escape_encoding(last_name)
             return last_name
         else:
             if self.missing:
@@ -701,6 +711,13 @@ def get_bibitems(input_filename, record_missing=True):
     if record_missing:
         bibitems.append(missing)
     return bibitems
+
+
+def escape_encoding(text):
+    encodings = re.compile(r'\\[Hbcdklortuv`\'\^"~=\.]{1}')
+    escaped_text = text.translate(None, '{}')
+    escaped_text = encodings.sub('', escaped_text)
+    return escaped_text
 
 
 def list_bibitems(bibitems):
