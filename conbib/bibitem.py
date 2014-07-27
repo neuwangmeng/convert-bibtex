@@ -264,6 +264,11 @@ class BibItem():
         """
         if self.author:
             split_with_and = self.author.split(' and ')
+            # Temporary fix for author lists that span mulitple lines.
+            # Currently, only the first line of author names will be parsed,
+            # and the last author from that list will be used for cite key
+            # generation.
+            split_with_and = filter(None, split_with_and)
             
             # We now have the last author
             last_author = split_with_and.pop()
@@ -640,7 +645,7 @@ def get_item_key(item):
 
 
 def is_item(item, line):
-    """Return True if current line contains item."""
+    """Return regular expression match object if current line contains item."""
     item_key = get_item_key(item) 
     return item_key.match(line)
 
@@ -674,7 +679,7 @@ def get_attribute_item(item, part, line):
 def get_file_length(filename):
     """Return the number of lines in filename."""
     with open(filename, 'rU') as filein:
-            lines = sum(1 for line in filein)
+        lines = sum(1 for line in filein)
     return lines
 
 
