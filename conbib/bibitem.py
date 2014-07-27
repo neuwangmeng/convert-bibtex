@@ -337,14 +337,14 @@ class _MissingAttribute():
                        '  *** WARNING ***\n'
                        '  Some citekeys are incomplete due to missing information\n'
                        '  Check your .bib file for the following missing items:\n'
-                       '     ------------------------------\n'
-                       '     %-20s  %8s\n'
-                       '     ------------------------------'
+                       '  ------------------------------\n'
+                       '  %-20s  %8s\n'
+                       '  ------------------------------'
                        % ('Missing Item', 'Count'))
             print warning
             for attr,num in self.missing_items.iteritems():
-                print '     %-20s  %8d' % (attr, num)
-            print '     ------------------------------'
+                print '  %-20s  %8d' % (attr, num)
+            print '  ------------------------------'
 
 
 # The functions below are used to parse the bib file.  They are included as
@@ -617,7 +617,7 @@ def get_year(line):
 def get_bibitem_type(line):
     """Return the bibitem type proceeding the `@' character."""
     allowed_entries = '|'.join(ENTRY_TYPES)
-    item_type = re.compile(r'^@(%s)\{' % allowed_entries)
+    item_type = re.compile(r'^@(%s)\s*\{' % allowed_entries)
     item_type_match = item_type.match(line)
     if item_type_match:
         return item_type_match.group(1)
@@ -690,7 +690,7 @@ def get_bibitems(input_filename, record_missing=True):
 
     """
     bibitems = []
-    missing = _MissingAttribute()
+    missing = _MissingAttribute() if record_missing else None
     file_length = get_file_length(input_filename)
     with open(input_filename, 'rU') as bibfile:
         for i in range(file_length):
