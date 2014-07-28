@@ -657,7 +657,7 @@ def is_bibitem_end(line):
 
 def get_item_key(item):
     """Return regular expression object for matching Bib attribute item."""
-    item = re.compile(r'(^\s*%s\s*=\s*\{?)(.+?)(\}?\,?$)' % item,
+    item = re.compile(r'(^\s*%s\s*=\s*\{?)(.+?)(\}\,?)' % item,
                       re.IGNORECASE)
     return item
 
