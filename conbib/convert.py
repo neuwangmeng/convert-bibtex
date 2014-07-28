@@ -57,7 +57,9 @@ def _make_citekey(bibitem):
 
     Current Format: [LastAuthorLastName][2-digitYear]_[FirstPage]
 
-    If the type is not 'article' then [FirstPage] is replaced with [Type]
+    If the type is not 'article' then [FirstPage] is replaced with [Type],
+    except for 'phdthesis' and 'mastersthesis', which are replaced with
+    'thesis'.
 
     """
     last_author_last_name = bibitem.get_last_author_last_name()
@@ -68,6 +70,8 @@ def _make_citekey(bibitem):
     if bibitem.bibtype == 'article':
         first_page = bibitem.get_first_page()
         citekey = '_'.join([citekey, first_page])
+    elif bibitem.bibtype == 'phdthesis' or bibitem.bibtype == 'mastersthesis':
+        citekey = '_'.join([citekey, 'thesis'])
     else:
         citekey = '_'.join([citekey, bibitem.bibtype])
     return citekey
