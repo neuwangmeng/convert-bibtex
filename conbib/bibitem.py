@@ -273,39 +273,45 @@ class BibItem():
         Otherwise, hyphens will be removed from the name.
 
         """
+        # If no author list give, use the editor list, otherwise, report item
+        # as 'MISSING'
         if self.author:
-            split_with_and = self.author.split(' and ')
-            # Temporary fix for author lists that span mulitple lines.
-            # Currently, only the first line of author names will be parsed,
-            # and the last author from that list will be used for cite key
-            # generation.
-            split_with_and = filter(None, split_with_and)
-            
-            # We now have the last author
-            last_author = split_with_and.pop()
-
-            # Extract the last name based on presence/absence of a comma
-            comma = re.compile(r'^(.+),.+')
-            match_comma = comma.match(last_author)
-            if match_comma:
-                last_name = match_comma.group(1).strip()
-                # One last step to remove last name prefix (i.e., 'van Kuiken')
-                split_with_space = last_name.split()
-                last_name = split_with_space.pop()
-            else:
-                split_with_space = last_author.split()
-                last_name = split_with_space.pop()
-            
-            # Sanitize the last name for citekey generation
-            if escape:
-                last_name = escape_encoding(last_name)
-            if not hyphenate:
-                last_name = last_name.translate(None, '-')
-            return last_name
+            author = self.author
+        elif self.editor:
+            author = self.editor
         else:
             if self.missing:
                 self.missing.add('Last Name')
             return 'MISSING'
+
+        split_with_and = author.split(' and ')
+        # Temporary fix for author lists that span mulitple lines.
+        # Currently, only the first line of author names will be parsed,
+        # and the last author from that list will be used for cite key
+        # generation.
+        split_with_and = filter(None, split_with_and)
+        
+        # We now have the last author
+        last_author = split_with_and.pop()
+
+        # Extract the last name based on presence/absence of a comma
+        comma = re.compile(r'^(.+),.+')
+        match_comma = comma.match(last_author)
+        if match_comma:
+            last_name = match_comma.group(1).strip()
+            # One last step to remove last name prefix (i.e., 'van Kuiken')
+            split_with_space = last_name.split()
+            last_name = split_with_space.pop()
+        else:
+            split_with_space = last_author.split()
+            last_name = split_with_space.pop()
+        
+        # Sanitize the last name for citekey generation
+        if escape:
+            last_name = escape_encoding(last_name)
+        if not hyphenate:
+            last_name = last_name.translate(None, '-')
+        return last_name
 
     def get_2d_year(self):
         """Return string containing the 2-digit year.
