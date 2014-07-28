@@ -510,132 +510,132 @@ def is_year(line):
 
 def get_address(line):
     """Return the contents of the `address' attribute."""
-    return get_attribute_item('address', 'contents', line)
+    return get_attribute_item('address', line)
 
 
 def get_annote(line):
     """Return the contents of the `annote' attribute."""
-    return get_attribute_item('annote', 'contents', line)
+    return get_attribute_item('annote', line)
 
 
 def get_author(line):
     """Return the contents of the `author' attribute."""
-    return get_attribute_item('author', 'contents', line)
+    return get_attribute_item('author', line)
 
 
 def get_booktitle(line):
     """Return the contents of the `booktitle' attribute."""
-    return get_attribute_item('booktitle', 'contents', line)
+    return get_attribute_item('booktitle', line)
 
 
 def get_chapter(line):
     """Return the contents of the `chapter' attribute."""
-    return get_attribute_item('chapter', 'contents', line)
+    return get_attribute_item('chapter', line)
 
 
 def get_crossref(line):
     """Return the contents of the `crossref' attribute."""
-    return get_attribute_item('crossref', 'contents', line)
+    return get_attribute_item('crossref', line)
 
 
 def get_edition(line):
     """Return the contents of the `edition' attribute."""
-    return get_attribute_item('edition', 'contents', line)
+    return get_attribute_item('edition', line)
 
 
 def get_editor(line):
     """Return the contents of the `editor' attribute."""
-    return get_attribute_item('editor', 'contents', line)
+    return get_attribute_item('editor', line)
 
 
 def get_eprint(line):
     """Return the contents of the `eprint' attribute."""
-    return get_attribute_item('eprint', 'contents', line)
+    return get_attribute_item('eprint', line)
 
 
 def get_howpublished(line):
     """Return the contents of the `howpublished' attribute."""
-    return get_attribute_item('howpublished', 'contents', line)
+    return get_attribute_item('howpublished', line)
 
 
 def get_institution(line):
     """Return the contents of the `institution' attribute."""
-    return get_attribute_item('institution', 'contents', line)
+    return get_attribute_item('institution', line)
 
 
 def get_journal(line):
     """Return the contents of the `journal' attribute."""
-    return get_attribute_item('journal', 'contents', line)
+    return get_attribute_item('journal', line)
 
 
 def get_key(line):
     """Return the contents of the `key' attribute."""
-    return get_attribute_item('key', 'contents', line)
+    return get_attribute_item('key', line)
 
 
 def get_month(line):
     """Return the contents of the `month' attribute."""
-    return get_attribute_item('month', 'contents', line)
+    return get_attribute_item('month', line)
 
 
 def get_note(line):
     """Return the contents of the `note' attribute."""
-    return get_attribute_item('note', 'contents', line)
+    return get_attribute_item('note', line)
 
 
 def get_number(line):
     """Return the contents of the `number' attribute."""
-    return get_attribute_item('number', 'contents', line)
+    return get_attribute_item('number', line)
 
 
 def get_organization(line):
     """Return the contents of the `organization' attribute."""
-    return get_attribute_item('organization', 'contents', line)
+    return get_attribute_item('organization', line)
 
 
 def get_pages(line):
     """Return the contents of the `pages' attribute."""
-    return get_attribute_item('pages', 'contents', line)
+    return get_attribute_item('pages', line)
 
 
 def get_publisher(line):
     """Return the contents of the `publisher' attribute."""
-    return get_attribute_item('publisher', 'contents', line)
+    return get_attribute_item('publisher', line)
 
 
 def get_school(line):
     """Return the contents of the `school' attribute."""
-    return get_attribute_item('school', 'contents', line)
+    return get_attribute_item('school', line)
 
 
 def get_series(line):
     """Return the contents of the `series' attribute."""
-    return get_attribute_item('series', 'contents', line)
+    return get_attribute_item('series', line)
 
 
 def get_title(line):
     """Return the contents of the `title' attribute."""
-    return get_attribute_item('title', 'contents', line)
+    return get_attribute_item('title', line)
 
 
 def get_type(line):
     """Return the contents of the `type' attribute."""
-    return get_attribute_item('type', 'contents', line)
+    return get_attribute_item('type', line)
 
 
 def get_url(line):
     """Return the contents of the `url' attribute."""
-    return get_attribute_item('url', 'contents', line)
+    return get_attribute_item('url', line)
 
 
 def get_volume(line):
     """Return the contents of the `volume' attribute."""
-    return get_attribute_item('volume', 'contents', line)
+    return get_attribute_item('volume', line)
 
 
 def get_year(line):
     """Return the contents of the `year' attribute."""
-    return get_attribute_item('year', 'contents', line)
+    return get_attribute_item('year', line)
 
 
 def get_bibitem_type(line):
@@ -663,8 +663,11 @@ def is_bibitem_end(line):
 
 def get_item_key(item):
     """Return regular expression object for matching Bib attribute item."""
-    item = re.compile(r'(^\s*%s\s*=\s*\{?)(.+?)(\}\,?)' % item,
-                      re.IGNORECASE)
+    item = re.compile(r"""
+                      ^\s*%s\s*=\s*     # Start of bibitem entry
+                      (\{?.+\}?)        # Content of the entry 
+                      ,?$               # End of line may contain comma
+                      """ % item, re.IGNORECASE|re.VERBOSE)
     return item
 
 
@@ -674,30 +677,19 @@ def is_item(item, line):
     return item_key.match(line)
 
 
-def get_attribute_item(item, part, line):
-    """Return the part of the attribute item for the given line. 
-    
-    This function returns one of three specified parts of the Bib item
-    attribute:
-        preffix    all text up to and including the `{'
-        contents   all text between the `{' and `}'
-        suffix     all text after and including the `}'
-    
-    """
-    group_mapping = {'preffix': 1, 'contents': 2, 'suffix': 3}
-    if part in group_mapping:
-        group = group_mapping[part]
-    else:
-        error('Invalid part given to get_attribute_item')
-
+def get_attribute_item(item, line):
+    """Return the contents of the attribute item for the given line."""
     item_key = get_item_key(item)
     item_key_match = is_item(item, line)
-
     if item_key_match:
-        item = item_key_match.group(group)
-    else:
-        item = None
-    return item
+        value = item_key_match.group(1)
+        # Remove braces and commas from start and end.  This isn't ideal as
+        # some starting/ending braces may be intended for purposes other than
+        # containing the entry value.  A better regex in the ``get_item_key``
+        # could be a fix for this.
+        value = value.strip('{},')
+        return value
+    return None 
 
 
 def get_file_length(filename):
