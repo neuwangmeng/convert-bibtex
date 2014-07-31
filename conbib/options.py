@@ -8,9 +8,7 @@ Command-line input options and program help documentation.
 import os.path
 import re
 import sys
-
-
-version = '0.4'
+from conbib import __version__ as version
 
 
 class CommandLineInput():
