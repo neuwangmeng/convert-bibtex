@@ -7,9 +7,10 @@
     :copyright: (c) 2014 by Li Research Group.
 """
 
-import os.path
 import re
 import sys
+import os.path
+
 from conbib import __version__ as version
 
 

@@ -323,7 +323,9 @@ class BibItem():
 
         """
         if self.year:
-            return self.year[2:]
+            year = self.year.strip()
+            year = year[2:]
+            return year
         else:
             if self.missing:
                 self.missing.add('Year')
@@ -332,7 +334,9 @@ class BibItem():
     def get_first_page(self):
         """Return string containing the first page in the pages range."""
         if self.pages:
-            return self.pages.split('-')[0]
+            page = self.pages.split('-')[0]
+            page = page.strip()
+            return page
         else:
             if self.missing:
                 self.missing.add('Page Number')
@@ -667,9 +671,9 @@ def is_bibitem_end(line):
 def get_item_key(item):
     """Return regular expression object for matching Bib attribute item."""
     item = re.compile(r"""
-                      ^\s*%s\s*=\s*     # Start of bibitem entry
-                      (\{?.+\}?)        # Content of the entry 
-                      ,?$               # End of line may contain comma
+                      ^\s*%s\s*=\s*         # Start of bibitem entry
+                      ([\{"]?.+[\}"]?)      # Content of the entry 
+                      ,?$                   # End of line may contain comma
                       """ % item, re.IGNORECASE|re.VERBOSE)
     return item
 
@@ -686,11 +690,13 @@ def get_attribute_item(item, line):
     item_key_match = is_item(item, line)
     if item_key_match:
         value = item_key_match.group(1)
-        # Remove braces and commas from start and end.  This isn't ideal as
-        # some starting/ending braces may be intended for purposes other than
-        # containing the entry value.  A better regex in the ``get_item_key``
-        # could be a fix for this.
-        value = value.strip('{},')
+        # First remove any spaces or newline characters.  Then, remove
+        # braces/quotes and commas from start and end.  This isn't ideal as
+        # some starting/ending braces/quotes may be intended for purposes
+        # other than containing the entry value.  A better regex in the
+        # ``get_item_key`` could be a fix for this.
+        value = value.strip()
+        value = value.strip('{}",')
         return value
     return None 
 
