@@ -5,6 +5,7 @@
     Conversions and cite key generation for BibTeX files.
 
     :copyright: (c) 2014 by Li Research Group.
+    :license: MIT, see LICENSE for more details.
 """
 
 # Program metadata
