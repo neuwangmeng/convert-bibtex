@@ -1,8 +1,10 @@
 """
-options module
+    conbib.options
+    ~~~~~~~~~~~~~~
 
-Command-line input options and program help documentation.
+    Command-line input options and program help documentation.
 
+    :copyright: (c) 2014 by Li Research Group.
 """
 
 import os.path

@@ -1,9 +1,11 @@
 """
-convert module
+    conbib.convert
+    ~~~~~~~~~~~~~~
 
-The main functions for converting titles to titlecase and generating citekeys
-are cotained within this module.
+    The main functions for converting titles to titlecase and generating
+    citekeys are cotained within this module.
 
+    :copyright: (c) 2014 by Li Research Group.
 """
 
 import re

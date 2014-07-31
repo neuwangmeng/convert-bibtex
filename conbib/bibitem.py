@@ -1,12 +1,15 @@
 """
-bibitem module
+    conbib.bibitem
+    ~~~~~~~~~~~~~~
 
-This module contains the BibItem class with methods for generating the Li
-group's standard citekey.  This module also contains several functions for
-parsing a LaTeX bib file including functions for matching and returning the
-contents of various bib item attributes. 
+    This module contains the BibItem class with methods for generating the Li
+    group's standard citekey.  This module also contains several functions for
+    parsing a LaTeX bib file including functions for matching and returning the
+    contents of various bib item attributes. 
 
+    :copyright: (c) 2014 by Li Research Group.
 """
+
 import re
 import sys
 import os.path
