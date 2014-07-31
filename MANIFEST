@@ -8,8 +8,10 @@ conbib/bibitem.py
 conbib/convert.py
 conbib/options.py
 conbib/titlecase.py
+conbib/tests/DOE_2014.bib
 conbib/tests/__init__.py
 conbib/tests/large.test.bib
 conbib/tests/missing.test.bib
+conbib/tests/play.py
 conbib/tests/small.test.bib
 conbib/tests/test_conbib.py
